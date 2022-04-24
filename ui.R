@@ -1,10 +1,14 @@
 library(shiny)
 library(shinyjs)
+library(shinycssloaders)
 
 g_columns <- setNames(colnames(iris), gsub("\\.", " ", colnames(iris)))
 
 # Define UI for application that draws a histogram
 shinyUI(navbarPage("Iris Analysis",
+                   tags$head(
+                     tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
+                   ),
 
 # Descriptive Analysis ----------------------------------------------------
 
@@ -46,8 +50,61 @@ shinyUI(navbarPage("Iris Analysis",
 # Clustering --------------------------------------------------------------
 
                    tabPanel("Clustering",
-                            verbatimTextOutput("placeholder1"))
-
-
+                            # Application title
+                            useShinyjs(),
+                            
+                            # Sidebar with a slider input for number of bins 
+                            sidebarLayout(
+                              sidebarPanel(
+                                radioButtons("radio_y_clust", "Select y-axis",
+                                             g_columns[1:4]),
+                                radioButtons("radio_x_clust", "Select x-axis",
+                                             g_columns[1:4],
+                                             selected = "Sepal.Width"),
+                                
+                                sliderInput("num_clutser",
+                                            "Number of clusters",
+                                            min = 1,
+                                            max = 6,
+                                            value = 3),
+                                actionButton("btn_plot_scatter", "create plot", icon = icon("chart-line")),
+                              ),
+                              
+                              # Show a plot of the generated distribution
+                              mainPanel(
+                                withSpinner(plotOutput("plot_scatter")),
+                                textOutput("text2")
+                              )
+                            )
+                          )
   )
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,12 +1,3 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(shinyjs)
 library(ggplot2)
@@ -44,7 +35,6 @@ shinyServer(function(input, output) {
       hide("bins")
       show("radio_col")
       show("radio_color")
-      
     }
     
   })
@@ -57,5 +47,60 @@ shinyServer(function(input, output) {
     }
     
   })
+  
+  create_scatter <- eventReactive(input$btn_plot_scatter, {
+    
+    if (input$radio_x_clust != input$radio_y_clust) {
+      
+      df_temp <- iris %>%
+        select(-"Species") %>%
+        scale()
+      
+      km_iris <- kmeans(df_temp, centers = input$num_clutser)
+      
+      iris_clustered <- iris %>%
+        cbind(km_iris$cluster) %>%
+        dplyr::rename(cluster = "km_iris$cluster")%>%
+        dplyr::mutate(cluster = as.factor(cluster))
+      
+      p_s <- ggplot(iris_clustered, aes_string(x = input$radio_x_clust, y = input$radio_y_clust, color = "cluster", shape = "Species")) +
+        geom_point(size = 3) +
+        theme_bw()
+      
+      print(p_s)
+    } else {
+      showNotification(paste("Please select distinct x and y-values"), duration = 4, type = "warning")
+    }
+    
+    })
+  
+  output$plot_scatter <- renderPlot({
+    create_scatter()
+  })
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
 })
